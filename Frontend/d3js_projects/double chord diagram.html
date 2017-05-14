@@ -1,0 +1,735 @@
+<!DOCTYPE html>
+<meta charset="utf-8">
+<head><link href="nouislider.min.css" rel="stylesheet"></head>
+<style>
+
+#circle circle {
+fill: none;
+pointer-events: all;
+}
+ 
+.group path {
+fill-opacity: .5;
+}
+ 
+path.chord {
+stroke: #000;
+stroke-width: .20px;
+}
+ 
+#circle:hover path.fade {
+display: none;
+}
+
+svg {
+    position: absolute;
+    left: 0;
+    top: 0;
+    z-index: -1;
+}
+
+.control-group-left {
+	position: absolute;
+	width: 120px;
+    left: 0;
+    padding-top: 5%;
+    margin: 5px;
+}
+
+.control-group-right {
+	position: absolute;
+	width: 120px;
+    right: 0;
+    padding-top: 5%;
+    margin: 5px;
+}
+
+#leftSlider {
+    position: absolute;
+	width: 33%;
+    right: 0;
+    margin: 48% 67% 0px 0px;
+}
+
+#rightSlider {
+    position: absolute;
+	width: 33%;
+    right: 0;
+    margin: 48% 0px 0px 0px;
+}
+
+.left_val-1 {
+	position : absolute;
+    font: 400 12px Arial;
+    color: #888;
+    display: block;
+    left: 0;
+    margin: 43% 83% 0px 10%;	
+}
+
+.left_val-mid {
+	position : absolute;
+    font: 400 12px Arial;
+    color: #888;
+    display: block;
+    left: 0;
+    margin: 41.5% 83% 0px 10%;	
+}
+
+.left_val-2 {
+	position : absolute;
+    font: 400 12px Arial;
+    color: #888;
+    display: block;
+    left: 0;
+    margin: 40% 83% 0px 10%;	
+}
+
+.right_val-1 {
+	position : absolute;
+    font: 400 12px Arial;
+    color: #888;
+    display: block;
+    right: 0;
+    margin: 43% 0% 0px 10%;	
+}
+
+.right_val-mid {
+	position : absolute;
+    font: 400 12px Arial;
+    color: #888;
+    display: block;
+    right: 0;
+    margin: 41.5% 0% 0px 10%;	
+}
+
+.right_val-2 {
+	position : absolute;
+    font: 400 12px Arial;
+    color: #888;
+    display: block;
+    right: 0;
+    margin: 40% 0% 0px 10%;	
+}
+
+/* From http://bost.ocks.org/mike/style.css?20120427 */
+ 
+@import url(http://fonts.googleapis.com/css?family=PT+Serif|PT+Serif:b|PT+Serif:i|PT+Sans|PT+Sans:b);
+ 
+html {
+/*min-width: 1040px;*/
+}
+ 
+body {
+background: #fcfcfa;
+color: #333;
+font-family: "PT Serif", serif;
+margin: 1em auto 4em auto;
+position: relative;
+width: 95%;
+}
+ 
+header,
+footer,
+h1,
+h2,
+h3,
+h4,
+aside {
+color: #000;
+font-family: "PT Sans", sans-serif;
+}
+ 
+h1 {
+font-size: 64px;
+font-weight: 300;
+letter-spacing: -2px;
+margin: .3em 0 .1em 0;
+}
+ 
+h2 {
+margin-top: 2em;
+}
+ 
+h1, h2 {
+text-rendering: optimizeLegibility;
+}
+ 
+h2 a {
+color: #ccc;
+left: -20px;
+position: absolute;
+/*width: 740px;*/
+}
+ 
+footer {
+font-size: small;
+margin-top: 8em;
+}
+ 
+header aside {
+margin-top: 88px;
+}
+ 
+header aside,
+footer aside {
+color: #636363;
+text-align: right;
+}
+ 
+aside {
+font-size: small;
+left: 0;
+position: absolute;
+width: 180px;
+}
+ 
+.attribution {
+font-size: small;
+margin-bottom: 2em;
+}
+ 
+body > p, li > p {
+line-height: 1.5em;
+}
+ 
+body > p {
+/*width: 720px;*/
+}
+ 
+body > blockquote {
+width: 640px;
+}
+ 
+blockquote q {
+display: block;
+font-style: oblique;
+}
+ 
+li {
+width: 680px;
+}
+ 
+a {
+color: steelblue;
+}
+ 
+a:not(:hover) {
+text-decoration: none;
+}
+ 
+pre, code, textarea {
+font-family: "Menlo", monospace;
+}
+ 
+code {
+line-height: 1em;
+}
+ 
+textarea {
+font-size: 100%;
+}
+ 
+body > pre {
+border-left: solid 2px #ccc;
+padding-left: 18px;
+margin: 2em 0 2em -20px;
+}
+ 
+.html .value,
+.javascript .string,
+.javascript .regexp {
+color: #756bb1;
+}
+ 
+.html .tag,
+.css .tag,
+.javascript .keyword {
+color: #3182bd;
+}
+ 
+.comment {
+color: #636363;
+}
+ 
+.html .doctype,
+.javascript .number {
+color: #31a354;
+}
+ 
+.html .attribute,
+.css .attribute,
+.javascript .class,
+.javascript .special {
+color: #e6550d;
+}
+ 
+svg {
+font: 7px sans-serif;
+}
+ 
+.axis path, .axis line {
+fill: none;
+stroke: #000;
+shape-rendering: crispEdges;
+}
+ 
+sup, sub {
+line-height: 0;
+}
+ 
+q:before {
+content: "â€œ";
+}
+ 
+q:after {
+content: "â€";
+}
+ 
+blockquote:before {
+position: absolute;
+left: 2em;
+}
+ 
+blockquote:after {
+position: absolute;
+}
+
+
+.ticks {
+  font: 10px sans-serif;
+}
+
+.track,
+.track-inset,
+.track-overlay {
+  stroke-linecap: round;
+}
+
+.track {
+  stroke: #000;
+  stroke-opacity: 0.3;
+  stroke-width: 10px;
+}
+
+.track-inset {
+  stroke: #ddd;
+  stroke-width: 8px;
+}
+
+.track-overlay {
+  pointer-events: stroke;
+  stroke-width: 50px;
+  cursor: crosshair;
+}
+
+.handle {
+  fill: #fff;
+  stroke: #000;
+  stroke-opacity: 0.5;
+  stroke-width: 1.25px;
+}
+
+
+</style>
+<script src="http://d3js.org/d3.v2.min.js?2.8.1"></script>
+<script src="nouislider.min.js"></script>
+
+<svg class="chart"></svg>
+<div id="leftSlider"></div>
+<span class="left_val-1" id="left-slider-value-lower">20.00</span>
+<span class="left_val-mid">to</span>
+<span class="left_val-2" id="left-slider-value-upper">20.00</span>
+
+<div id="rightSlider"></div>
+<span class="right_val-1" id="right-slider-value-lower">20.00</span>
+<span class="right_val-mid">to</span>
+<span class="right_val-2" id="right-slider-value-upper">20.00</span>
+
+<aside>Mouseover to view the flow between two game states.</aside>
+
+<script>
+
+var category_l = "all";
+var category_r = "all";
+
+var width = window.innerWidth,
+    height = window.innerWidth/2,
+    c_width = width/3,
+    widthOffset = width/5,
+outerRadius = Math.min(c_width, height) / 2 - 10,
+innerRadius = outerRadius - 24;
+
+var formatPercent = d3.format(".1%");
+ 
+var arc = d3.svg.arc()
+.innerRadius(innerRadius)
+.outerRadius(outerRadius);
+ 
+var layout = d3.layout.chord()
+.padding(.04)
+.sortSubgroups(d3.descending)
+.sortChords(d3.ascending);
+ 
+var path = d3.svg.chord()
+.radius(innerRadius);
+ 
+var svg = d3.select(".chart")
+.attr("width", width)
+.attr("height", height)
+.append("g")
+.attr("id", "circle1")
+.attr("transform", "translate(" + (-300 + (width / 2)) + "," + height / 2 + ")");
+
+var svg2 = d3.select(".chart")
+.append("g")
+.attr("id", "circle2")
+.attr("transform", "translate(" + (200 + (width / 2)) + "," + height / 2 + ")");
+
+svg.append("circle1").attr("r", outerRadius);
+svg2.append("circle2").attr("r", outerRadius);
+
+var color = d3.scale.category20();
+
+var leftSlider = document.getElementById('leftSlider');
+var rightSlider = document.getElementById('rightSlider');
+
+var timeStamp = Math.floor(Date.now() / 1000); 
+var startDate = 1483000000;
+
+var leftTimeLimits = [startDate, timeStamp];
+var rightTimeLimits = [startDate, timeStamp];
+
+noUiSlider.create(leftSlider, {
+	start: leftTimeLimits,
+	connect: true,
+	range: {
+		'min': startDate,
+		'max': timeStamp
+	}
+});
+
+noUiSlider.create(rightSlider, {
+	start: rightTimeLimits,
+	connect: true,
+	range: {
+		'min': startDate,
+		'max': timeStamp
+	}
+});
+
+var leftSliderValues = [
+	document.getElementById('left-slider-value-lower'),
+	document.getElementById('left-slider-value-upper')
+];
+
+var rightSliderValues = [
+	document.getElementById('right-slider-value-lower'),
+	document.getElementById('right-slider-value-upper')
+];
+
+var renderingLeft = false;
+var renderingRight = false;
+
+leftSlider.noUiSlider.on('update', function( values, handle ) {
+	leftSliderValues[handle].innerHTML = timeConverter(values[handle]);
+	leftTimeLimits = values;
+	if (!renderingLeft){	
+		renderingLeft = true; //lock out repeated calls to render caused by the slider.
+		setTimeout(function (){renderingLeft = false;}, 300);
+		renderLeft();
+	}
+});
+
+rightSlider.noUiSlider.on('update', function( values, handle ) {
+	rightSliderValues[handle].innerHTML = timeConverter(values[handle]);
+	rightTimeLimits = values;
+	if (!renderingRight){	
+		renderingRight = true; //lock out repeated calls to render caused by the slider.
+		setTimeout(function (){renderingRight = false;}, 300);
+		renderRight();
+	}
+});
+
+
+function getIndex(link, nodes){
+	var index = -1;
+	nodes.forEach(function(d, i) {
+        if (link == d.id){
+        	index = i;
+        }
+     });
+     return index;
+}	
+
+
+function timeConverter(UNIX_timestamp){
+  var a = new Date(UNIX_timestamp * 1000);
+  var months = ['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'];
+  var year = a.getFullYear();
+  var month = months[a.getMonth()];
+  var date = a.getDate();
+  //var hour = a.getHours();
+  //var min = a.getMinutes();
+  //var sec = a.getSeconds();
+  var time = date + ' ' + month + ' ' + year;
+  //var time = date + ' ' + month + ' ' + year + ' ' + hour + ':' + min + ':' + sec ;
+  return time;
+}
+
+function renderLeft() {
+
+	d3.json("https://dl.dropbox.com/s/5xld18nw57ii49a/combinedEvents.json?dl=1", function (graph) {
+	  svg.selectAll("*").remove();
+	  
+	  if (category_l == "") return;
+
+	  var matrix = [],
+		nodes = graph.nodes,
+		n = nodes.length;
+
+		//Compute index per node.
+		nodes.forEach(function(node, i) {
+			//node.index = i;
+			//node.count = 0;
+			
+			matrix[i] = d3.range(n).map(function(j) {
+				return 0;
+			});
+		});
+
+		// Convert links to matrix; count character occurrences.
+		graph.links.forEach(function(link) {
+			var source = getIndex(link.source, nodes);
+			var target = getIndex(link.target, nodes);
+			//this is the filtering step
+			if ((category_l == "all") || (category_l.toLowerCase() == link.locale.toLowerCase()	)) {
+				if ((+link.timestamp < +leftTimeLimits[1]) && (+link.timestamp > +leftTimeLimits[0])){
+					matrix[source][target] += +link.value;
+				}
+			}
+			//matrix[target][source] += +link.value;
+			//matrix[source][source] += +link.value;
+			//matrix[target][target] += +link.value;
+		});
+	
+		// Compute the chord layout.
+		layout.matrix(matrix);
+	
+		// Add a group per event.
+		var group = svg.selectAll(".group")
+		.data(layout.groups)
+		.enter().append("g")
+		.attr("class", "group")
+		.on("mouseover", mouseover);
+ 
+		// Add the group arc.
+		var groupPath = group.append("path")
+		.attr("id", function(d, i) { return "group" + i; })
+		.attr("d", arc)
+		.style("fill", function(d, i) { return color(graph.nodes[d.index].id);});
+	
+		// Add a text label.
+		var groupText = group.append("text")
+		.attr("x", 6)
+		.attr("dy", 15);
+
+		groupText.append("textPath")
+		.attr("xlink:href", function(d, i) { return "#group" + i; })
+		.text(function(d, i) { return nodes[i].id; });
+
+		// Remove the labels that don't fit. :(
+		groupText.filter(function(d, i) { return groupPath[0][i].getTotalLength() / 2 - 16 < this.getComputedTextLength(); })
+		.remove();
+ 
+		// Add the chords.
+		var chord = svg.selectAll(".chord")
+		.data(layout.chords)
+		.enter().append("path")
+		.attr("class", "chord")
+		.style("fill", function(d) {
+			if (d.source.value >= d.target.value) 
+				return color(graph.nodes[d.source.index].id);
+				else return color(graph.nodes[d.target.index].id);
+			})
+		//.style("stroke", function(d) {return color(graph.nodes[d.target.index].id)})
+		.style("opacity", 0.67)
+		.attr("d", path);
+ 
+		// Add an elaborate mouseover title for each chord.
+		chord.append("title").text(function(d) {
+		 return graph.nodes[d.source.index].id
+		 + " → " + graph.nodes[d.target.index].id
+		 + ": " + d.source.value
+		 + "\n" + graph.nodes[d.target.index].id
+		 + " → " + graph.nodes[d.source.index].id
+		 + ": " + d.target.value;
+		 });
+ 
+		function mouseover(d, i) {
+			chord.classed("fade", function(p) {
+				return p.source.index != i && p.target.index != i;
+			});
+		};
+	});
+}
+
+function renderRight() {
+
+	d3.json("https://dl.dropbox.com/s/5xld18nw57ii49a/combinedEvents.json?dl=1", function (graph) {
+	  svg2.selectAll("*").remove();
+	  
+	  if (category_r == "") return;
+
+	  var matrix = [],
+		nodes = graph.nodes,
+		n = nodes.length;
+
+		//Compute index per node.
+		nodes.forEach(function(node, i) {
+			//node.index = i;
+			//node.count = 0;
+			
+			matrix[i] = d3.range(n).map(function(j) {
+				return 0;
+			});
+		});
+
+		// Convert links to matrix; count character occurrences.
+		graph.links.forEach(function(link) {
+			var source = getIndex(link.source, nodes);
+			var target = getIndex(link.target, nodes);
+			//this is the filtering step
+			if ((category_r == "all") || (category_r.toLowerCase() == link.locale.toLowerCase()	)) {
+				if ((+link.timestamp < +rightTimeLimits[1]) && (+link.timestamp > +rightTimeLimits[0])){
+					matrix[source][target] += +link.value;
+				}
+			}
+			//matrix[target][source] += +link.value;
+			//matrix[source][source] += +link.value;
+			//matrix[target][target] += +link.value;
+		});
+	
+		// Compute the chord layout.
+		layout.matrix(matrix);
+	
+		// Add a group per event.
+		var group = svg2.selectAll(".group")
+		.data(layout.groups)
+		.enter().append("g")
+		.attr("class", "group")
+		.on("mouseover", mouseover);
+		
+		// Add the group arc.
+		var groupPath = group.append("path")
+		.attr("id", function(d, i) { return "groupRight" + i; })
+		.attr("d", arc)
+		.style("fill", function(d, i) { return color(graph.nodes[d.index].id);});
+	
+		// Add a text label.
+		var groupText = group.append("text")
+		.attr("x", 6)
+		.attr("dy", 15);
+
+		groupText.append("textPath")
+		.attr("xlink:href", function(d, i) { return "#groupRight" + i; })
+		.text(function(d, i) { return nodes[i].id; });
+ 		
+		// Remove the labels that don't fit. :(
+		groupText.filter(function(d, i) { return groupPath[0][i].getTotalLength() / 2 - 16 < this.getComputedTextLength(); })
+		.remove();
+ 
+		// Add the chords.
+		var chord = svg2.selectAll(".chord")
+		.data(layout.chords)
+		.enter().append("path")
+		.attr("class", "chord")
+		.style("fill", function(d) {
+			if (d.source.value >= d.target.value) 
+				return color(graph.nodes[d.source.index].id);
+				else return color(graph.nodes[d.target.index].id);
+			})
+		//.style("stroke", function(d) {return color(graph.nodes[d.target.index].id)})
+		.style("opacity", 0.67)
+		.attr("d", path);
+ 
+		// Add an elaborate mouseover title for each chord.
+		chord.append("title").text(function(d) {
+		 return graph.nodes[d.source.index].id
+		 + " → " + graph.nodes[d.target.index].id
+		 + ": " + d.source.value
+		 + "\n" + graph.nodes[d.target.index].id
+		 + " → " + graph.nodes[d.source.index].id
+		 + ": " + d.target.value;
+		 });
+ 
+		function mouseover(d, i) {
+			chord.classed("fade", function(p) {
+				return p.source.index != i && p.target.index != i;
+			});
+		};
+	});
+}
+
+function select(direction, c) { //ref:https://bl.ocks.org/fabiomainardi/00fd581dc5ba92d99eec
+	if (direction == 'l')
+	{
+		category_l = c;
+		renderLeft(); 
+	}
+	else {
+		category_r = c;
+		renderRight(); 
+	}      
+}
+
+
+</script>
+
+<div class="control-group-left"> 
+	<button onclick="select('l','all')">
+        All Countries
+    </button>
+    <button onclick="select('l','de')">
+        Germany
+    </button>
+    <button onclick="select('l','en-us')">
+        United States
+    </button>
+    <button onclick="select('l','en-gb')">
+    	Britain
+    </button>
+    <button onclick="select('l','el-gr')">
+        Greece (Greek)
+    </button>
+    <button onclick="select('l','el')">
+        Greece (English)
+    </button>
+    <button onclick="select('l','')">
+        Clear
+    </button>
+</div>
+
+<div class="control-group-right"> 
+	<button onclick="select('r','all')">
+        All Countries
+    </button>
+    <button onclick="select('r','de')">
+        Germany
+    </button>
+    <button onclick="select('r','en-us')">
+        United States
+    </button>
+    <button onclick="select('r','en-gb')">
+    	Britain
+    </button>
+    <button onclick="select('r','el-gr')">
+        Greece (Greek)
+    </button>
+    <button onclick="select('r','el')">
+        Greece (English)
+    </button>
+    <button onclick="select('r','')">
+        Clear
+    </button>
+</div>
