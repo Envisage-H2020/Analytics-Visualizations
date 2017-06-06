@@ -1,0 +1,3 @@
+[submodule "js/Analytics-Metrics"]
+	path = js/Analytics-Metrics
+	url = git@github.com:Envisage-H2020/Analytics-Metrics.git
