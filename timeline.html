@@ -1,0 +1,555 @@
+<!DOCTYPE html>
+<meta charset="utf-8">
+<head>
+	<link href="css/nouislider.min.css" rel="stylesheet">
+	<script src="js/envisage_shallow.js"></script>
+</head>
+<style>
+
+svg {
+    position: relative;
+    left: 0;
+    top: 0;
+    z-index: -1;
+}
+
+#legend {
+    position: fixed;
+    right: 0;
+    top: 0;
+    z-index: -1;
+}
+
+.legend {
+    font: 0.5em sans-serif;
+  }
+
+.control-group {
+	width: %;
+	position: fixed;
+    left: 5%;
+    padding-top: 2%;
+}
+
+#container {
+	z-index: 1;
+    position: fixed;
+    left: 0;
+    right: 0;
+    top: 0;  
+    height: 40%;
+    background:rgba(63,184,175,0.25);	
+}
+    
+#slider {
+    position: fixed;
+	width: 50%;
+    right: 5%;
+    margin: 5% 0em 0em 0em;
+}
+
+.example-val-1 {
+	position : fixed;
+    font: 1em Arial;
+    color: #888;
+    display: block;
+    right: 5%;
+    margin: 13% 0% 0em 10%;	
+}
+
+.example-val-mid {
+	position : fixed;
+    font: 1em Arial;
+    color: #888;
+    display: block;
+    right: 5%;
+    margin: 11.5% 0% 0em 10%;	
+}
+
+.example-val-2 {
+	position : fixed;
+    font: 1em Arial;
+    color: #888;
+    display: block;
+    right: 5%;
+    margin: 10% 0% 0em 10%;	
+}
+
+/* From http://bost.ocks.org/mike/style.css?20120427 */
+ 
+@import url(http://fonts.googleapis.com/css?family=PT+Serif|PT+Serif:b|PT+Serif:i|PT+Sans|PT+Sans:b);
+ 
+html {
+min-width: 1040em;
+}
+ 
+body {
+background: #fcfcfa;
+color: #333;
+font-family: "PT Serif", serif;
+margin: 1em auto 4em auto;
+position: relative;
+width: 100%;
+}
+ 
+header,
+footer,
+h1,
+h2,
+h3,
+h4,
+aside {
+color: #000;
+font-family: "PT Sans", sans-serif;
+}
+ 
+footer {
+font-size: small;
+margin-top: 8em;
+}
+ 
+header aside {
+margin-top: 88em;
+}
+ 
+header aside,
+footer aside {
+color: #636363;
+text-align: right;
+}
+ 
+aside {
+font-size: small;
+left: 0;
+position: absolute;
+width: 180em;
+}
+ 
+.attribution {
+font-size: small;
+margin-bottom: 2em;
+}
+ 
+body > p, li > p {
+line-height: 1.5em;
+}
+ 
+body > p {
+width: 720em;
+}
+ 
+body > blockquote {
+width: 640em;
+}
+ 
+blockquote q {
+display: block;
+font-style: oblique;
+}
+ 
+li {
+width: 680em;
+}
+ 
+a {
+color: steelblue;
+}
+ 
+a:not(:hover) {
+text-decoration: none;
+}
+ 
+pre, code, textarea {
+font-family: "Menlo", monospace;
+}
+ 
+code {
+line-height: 1em;
+}
+ 
+textarea {
+font-size: 100%;
+}
+ 
+body > pre {
+border-left: solid 2em #ccc;
+padding-left: 18em;
+margin: 2em 0 2em -20em;
+}
+ 
+.html .value,
+.javascript .string,
+.javascript .regexp {
+color: #756bb1;
+}
+ 
+.html .tag,
+.css .tag,
+.javascript .keyword {
+color: #3182bd;
+}
+ 
+.comment {
+color: #636363;
+}
+ 
+.html .doctype,
+.javascript .number {
+color: #31a354;
+}
+ 
+.html .attribute,
+.css .attribute,
+.javascript .class,
+.javascript .special {
+color: #e6550d;
+}
+ 
+svg {
+font: 1em sans-serif;
+}
+ 
+.axis path, .axis line {
+fill: none;
+stroke: #000;
+shape-rendering: crispEdges;
+}
+ 
+sup, sub {
+line-height: 0;
+}
+ 
+q:before {
+content: "â€œ";
+}
+ 
+q:after {
+content: "â€";
+}
+ 
+blockquote:before {
+position: absolute;
+left: 2em;
+}
+ 
+blockquote:after {
+position: absolute;
+}
+
+
+.ticks {
+  font: 10em sans-serif;
+}
+
+.track,
+.track-inset,
+.track-overlay {
+  stroke-linecap: round;
+}
+
+.track {
+  stroke: #000;
+  stroke-opacity: 0.3;
+  stroke-width: 10em;
+}
+
+.track-inset {
+  stroke: #ddd;
+  stroke-width: 8em;
+}
+
+.track-overlay {
+  pointer-events: stroke;
+  stroke-width: 50em;
+  cursor: crosshair;
+}
+
+.handle {
+  fill: #fff;
+  stroke: #000;
+  stroke-opacity: 0.5;
+  stroke-width: 1.25em;
+}
+
+
+</style>
+
+<script src="https://d3js.org/d3.v4.min.js"></script>
+<script src="js/nouislider.min.js"></script>
+
+<div id="container">
+	<div id="slider"></div>
+	<span class="example-val-2" id="slider-value-lower">20.00</span>
+	<span class="example-val-mid">to</span>
+	<span class="example-val-1" id="slider-value-upper">20.00</span>
+	<svg id="legend"></svg>
+	<div class="control-group"> 
+		<button onclick="select('all')">
+			All Countries
+		</button>
+		<br>
+		<button onclick="select('de')">
+			Germany
+		</button>
+		<br>
+		<button onclick="select('en-us')">
+			United States
+		</button>
+		<br>
+		<button onclick="select('en-gb')">
+			Britain
+		</button>
+		<br>
+		<button onclick="select('el-gr')">
+			Greece (Greek)
+		</button>
+		<br>
+		<button onclick="select('el')">
+			Greece (English)
+		</button>
+		<br>
+		<button onclick="select()">
+			Clear
+		</button>
+		<br>
+		<button onclick="mode(false)">
+			Time Scale
+		</button>
+		<br>
+		<button onclick="mode(true)">
+			Percentage Scale
+		</button>
+	</div>
+
+</div>
+
+<svg id="chart"></svg>
+
+
+<script>
+
+var category = "all";
+
+var absolute = true;
+
+var width = window.innerWidth*3,
+    height = window.innerHeight*5,
+    legendSpacing = window.innerHeight*0.009,
+    legendRectSize = window.innerHeight*0.009;
+
+var margin = {top: width/10, right: width/30, bottom: width/30, left: width/15},
+    width = width - margin.left - margin.right,
+    height = height - margin.top - margin.bottom;
+    
+var svg = d3.select("#chart")
+.attr("width", width + margin.left + margin.right)
+    .attr("height", height + margin.top + margin.bottom)
+  .append("g")
+    .attr("transform", 
+          "translate(" + margin.left + "," + margin.top + ")");
+          
+var svglegend = d3.select("#legend")
+.attr("width", width/30 + margin.left + margin.right)
+    .attr("height", height/30 + margin.top + margin.bottom)
+  .append("g")
+    .attr("transform", 
+          "translate(" + margin.left + "," + (height*0.01) + ")");         
+
+var color = d3.scaleOrdinal(d3.schemeCategory20); //more scales here :https://github.com/d3/d3-scale/blob/master/README.md#category-scales
+        
+var slider = document.getElementById('slider');
+
+var timeStamp = Math.floor(Date.now() / 1000); 
+var startDate = 1483000000;
+
+var timeLimits = [startDate, timeStamp];
+
+noUiSlider.create(slider, {
+	start: timeLimits,
+	connect: true,
+	range: {
+		'min': startDate,
+		'max': timeStamp
+	}
+});
+
+var sliderValues = [
+	document.getElementById('slider-value-lower'),
+	document.getElementById('slider-value-upper')
+];
+
+slider.noUiSlider.on('update', function( values, handle ) {
+	sliderValues[handle].innerHTML = timeConverter(values[handle]);
+	timeLimits = values;
+	render();
+});
+	
+
+var legendValues;
+
+function getLegendValues(nodes){
+	legendValues = new Array();
+	nodes.forEach(function(d, i) {
+		index = -1;
+		legendValues.forEach(function(ld, j) {
+        if (ld.event == d.event){
+        	index = j;
+        }});
+        if (index == -1){
+        	//found an event missing from legendValues!
+        	legendValues.push({event:nodes[i].event});
+        }
+     });
+     return index; //needed?
+}
+
+function renderLegend(){ //update the Legend svg with new data, showing only what is needed
+	svglegend.selectAll("*").remove();
+		  
+	var legend = svglegend.selectAll(".legend")
+	  .data(legendValues)
+	  .enter()
+	  .append('g')
+	  .attr('class', 'legend')
+	  .attr('transform', function(d, i) {
+		var height = legendRectSize + legendSpacing;
+		var offset =  7 * height;
+		var horz = -7 * legendRectSize;
+		var vert = i * height;
+		return 'translate(' + horz + ',' + vert + ')';
+	});	
+
+	legend.append('rect')
+	  .attr('width', legendRectSize)
+	  .attr('height', legendRectSize)
+	  .style('fill', function(d) { return color(d.event); })
+	  .style('stroke', function(d) { return color(d.event); }); 
+
+	legend.append('text')
+	  .attr('x', legendRectSize + legendSpacing)
+	  .attr('y', 8 + legendRectSize - legendSpacing)
+	  .text(function(d) { return d.event; });
+}
+
+function select(c) { //Toggle between categories. Ref:https://bl.ocks.org/fabiomainardi/00fd581dc5ba92d99eec
+	category = c;
+	render();     
+}
+
+function mode(c) { //Toggle between the two render modes. Ref:https://bl.ocks.org/fabiomainardi/00fd581dc5ba92d99eec
+	absolute = c;
+	render();
+}
+
+function render() {
+	if (absolute)
+		renderAbsolute();    
+	else renderRelative(); 
+}
+
+function renderAbsolute() {
+	d3.text("https://dl.dropbox.com/s/4t0oo4g14aalhpo/combined.json?dl=1", function(error, text) {
+		if (error) throw error;
+		svg.selectAll("*").remove(); //refresh svg graphics	
+		
+		var data = convertToJson(text);	  
+		var graph = convertLinksToDataStructure(data);
+							
+        getLegendValues(graph); //prepare the data to create a legend      
+        calculatePlaythroughOrder(graph, legendValues); //create a levenshtein-based sorting data structure
+         
+		// set the ranges
+		var y = d3.scaleBand()
+				  .range([height, 0])
+				  .padding(0.2);
+
+		var x = d3.scaleLinear()
+				  .range([0, width]);
+		  
+		// Scale the range of the data in the domains
+		x.domain([0.0, 1.0]) //measure the length of each playthrough	  
+		y.domain(graph.map(function(d) { return d.id; }));
+			
+		renderLegend();
+		
+		// append the rectangles for the bar chart
+		svg.selectAll(".bar")
+		  .data(graph)
+		.enter().append("rect")
+		  .attr("class", "bar")
+		  .attr("x", function(d) {return x((d.times.starting_time - d.times.session_starting_time)/(d.times.session_ending_time-d.times.session_starting_time)); })
+		  .attr("width", function(d) {
+		  	var a = x((d.times.starting_time - d.times.session_starting_time)/(d.times.session_ending_time-d.times.session_starting_time));
+		  	var b = x((d.times.ending_time - d.times.session_starting_time)/(d.times.session_ending_time-d.times.session_starting_time)); 
+			w = b - a;
+		  	if (w > 0) return w;}
+		  	)
+		  .attr("y", function(d) { return y(d.id);})
+		  .attr("fill", function(d) { return color(d.event); })
+		  .attr("user", function(d) { return d.id; })
+		  .attr("height", y.bandwidth());
+	
+		//add the x Axis
+		svg.append("g")
+		  .attr("transform", "translate(0," + height + ")")
+		  .call(d3.axisBottom(x)	  	  	
+		  	.ticks(20));
+		  	//.tickFormat(d3.timeFormat('%Hhours-%Mmin-%Ss')));
+		  	
+		//add the y Axis
+		svg.append("g")
+		  .call(d3.axisLeft(y));
+	});
+}
+
+function renderRelative() {
+	d3.text("https://dl.dropbox.com/s/4t0oo4g14aalhpo/combined.json?dl=1", function(error, text) {
+     if (error) throw error;
+		svg.selectAll("*").remove(); //refresh svg graphics	
+		
+		var data = convertToJson(text);	  
+		var graph = convertLinksToDataStructure(data);
+							
+        getLegendValues(graph); //prepare the data to create a legend      
+        calculatePlaythroughOrder(graph, legendValues); //create a levenshtein-based sorting data structure
+        
+		// set the ranges
+		var y = d3.scaleBand()
+				  .range([height, 0])
+				  .padding(0.2);
+
+		var x = d3.scaleLinear()
+				  .range([0, width]);
+		  
+		// Scale the range of the data in the domains  
+		x.domain([0, d3.max(graph, function(d){return d.times.ending_time - d.times.session_starting_time})]) //measure the length of each playthrough
+		y.domain(graph.map(function(d) { return d.id; }));
+	  
+		renderLegend();
+	  
+		// append the rectangles for the bar chart
+		svg.selectAll(".bar")
+		  .data(graph)
+		.enter().append("rect")
+		  .attr("class", "bar")
+		  .attr("x", function(d) { return x(d.times.starting_time - d.times.session_starting_time); })
+		  .attr("width", function(d) {w = x(d.times.ending_time - d.times.starting_time); if (w > 0) return w; } )
+		  .attr("y", function(d) { return y(d.id);})
+		  .attr("fill", function(d) { return color(d.event); })
+		  .attr("user", function(d) { return d.id; })
+		  .attr("height", y.bandwidth());
+	
+		 // add the x Axis
+		 svg.append("g")
+		  .attr("transform", "translate(0," + height + ")")
+		  .call(d3.axisBottom(x)	  	  	
+		  	.ticks(20)
+		  	.tickFormat(d3.timeFormat('%Hhours-%Mmin-%Ss')));
+		  	
+		 // add the y Axis
+		 svg.append("g")
+			.call(d3.axisLeft(y));
+	});
+}
+
+</script>

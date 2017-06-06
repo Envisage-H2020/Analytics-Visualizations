@@ -1,0 +1,389 @@
+<!DOCTYPE html>
+<meta charset="utf-8">
+<head><link href="css/nouislider.min.css" rel="stylesheet"></head>
+
+<style>
+
+@import url(http://fonts.googleapis.com/css?family=PT+Serif|PT+Serif:b|PT+Serif:i|PT+Sans|PT+Sans:b);
+ 
+ 
+body {
+background: #fcfcfa;
+color: #333;
+font-family: "PT Serif", serif;
+}
+ 
+header,
+footer,
+h1,
+h2,
+h3,
+h4,
+aside {
+color: #000;
+font-family: "PT Sans", sans-serif;
+}
+
+header aside {
+margin-top: 88px;
+}
+ 
+header aside,
+footer aside {
+color: #636363;
+text-align: right;
+}
+ 
+aside {
+font-size: small;
+top: 5%;
+right: 10%;
+position: absolute;
+width: 180px;
+}
+
+.links line {
+  stroke-opacity: 0.4;
+}
+
+.nodes circle {
+  stroke: #fff;
+  stroke-width: 1.5px;
+}
+
+.legend {
+    font: 12px sans-serif;
+  }
+  
+rect {
+    stroke-width: 2; 
+}
+
+.control-group {
+    padding-top: 2%;
+    margin: 10px;
+}
+
+svg {
+    position: absolute;
+    left: 0;
+    top: 0;
+    z-index: -1;
+}
+
+
+#slider {
+    position: absolute;
+	width: 25%;
+    right: 5%;
+    margin: 5% 0px 0px 0px;
+}
+
+.example-val-1 {
+	position : absolute;
+    font: 400 12px Arial;
+    color: #888;
+    display: block;
+    right: 5%;
+    margin: 13% 0% 0px 5%;	
+}
+
+.example-val-mid {
+	position : absolute;
+    font: 400 12px Arial;
+    color: #888;
+    display: block;
+    right: 5%;
+    margin: 11.5% 0% 0px 5%;	
+}
+
+.example-val-2 {
+	position : absolute;
+    font: 400 12px Arial;
+    color: #888;
+    display: block;
+    right: 5%;
+    margin: 10% 0% 0px 5%;	
+}
+
+.track,
+.track-inset,
+.track-overlay {
+  stroke-linecap: round;
+}
+
+.track {
+  stroke: #000;
+  stroke-opacity: 0.3;
+  stroke-width: 10px;
+}
+
+.track-inset {
+  stroke: #ddd;
+  stroke-width: 8px;
+}
+
+.track-overlay {
+  pointer-events: stroke;
+  stroke-width: 50px;
+  cursor: crosshair;
+}
+
+.handle {
+  fill: #fff;
+  stroke: #000;
+  stroke-opacity: 0.5;
+  stroke-width: 1.25px;
+}
+
+</style>
+<script src="https://d3js.org/d3.v4.min.js"></script>
+<script src="js/nouislider.min.js"></script>
+
+<svg class="chart"></svg>
+<div id="slider"></div>
+<span class="example-val-1" id="slider-value-lower">START DATE</span>
+<span class="example-val-mid">to</span>
+<span class="example-val-2" id="slider-value-upper">END DATE</span>
+<aside>The color of each link indicates which node it started from.</aside>
+<script>
+
+var category = "all";
+
+var width = window.innerWidth,
+    height = window.innerHeight,
+    legendSpacing = 12,
+    legendRectSize = 12;
+
+var svg = d3.select("svg")
+	.attr("width", width)
+    .attr("height", height);
+
+var color = d3.scaleOrdinal(d3.schemeCategory20);
+
+var simulation = d3.forceSimulation()
+		.force("link", d3.forceLink().distance(300).id(function(d) { return d.id; }))
+		.force("charge", d3.forceManyBody())
+		.force("center", d3.forceCenter(width / 2, height / 2));
+		
+var slider = document.getElementById('slider');
+
+var timeStamp = Math.floor(Date.now() / 1000); 
+var startDate = 1483000000;
+
+var timeLimits = [startDate, timeStamp];
+
+noUiSlider.create(slider, {
+	start: timeLimits,
+	connect: true,
+	range: {
+		'min': startDate,
+		'max': timeStamp
+	}
+});
+
+var sliderValues = [
+	document.getElementById('slider-value-lower'),
+	document.getElementById('slider-value-upper')
+];
+
+var rendering = false;
+
+slider.noUiSlider.on('update', function( values, handle ) {
+	//if ((values[0] != timeLimits[0]) && (values[1] != timeLimits[1])){
+		sliderValues[handle].innerHTML = timeConverter(values[handle]);
+		timeLimits = values;
+		if (!rendering){	
+			rendering = true; //lock out repeated calls to render caused by the slider.
+			render();
+			setTimeout(semaphore, 1000);
+		}
+	//}
+});
+
+function semaphore(){
+	rendering = false;
+}
+		
+function timeConverter(UNIX_timestamp){
+  var a = new Date(UNIX_timestamp * 1000);
+  var months = ['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'];
+  var year = a.getFullYear();
+  var month = months[a.getMonth()];
+  var date = a.getDate();
+  //var hour = a.getHours();
+  //var min = a.getMinutes();
+  //var sec = a.getSeconds();
+  var time = date + ' ' + month + ' ' + year;
+  //var time = date + ' ' + month + ' ' + year + ' ' + hour + ':' + min + ':' + sec ;
+  return time;
+}
+
+function render() {
+	d3.json("https://dl.dropbox.com/s/5xld18nw57ii49a/combinedEvents.json?dl=1", function(error, graph) {
+	  if (error) throw error;
+	  
+	svg.selectAll("*").remove();
+	 var uniques = [];
+	 var node = null;
+		   
+	// add the definition of the arrow to the SVG.
+svg.append("svg:defs").selectAll("marker")
+    .data(["end"])      // Different link/path types can be defined here
+  .enter().append("svg:marker")    // This section adds in the arrows
+    .attr("id", String)
+    .attr("viewBox", "0 -5 10 10")
+    .attr("refX", 15)
+    .attr("refY", -1.5)
+    .attr("markerWidth", 6)
+    .attr("markerHeight", 6)
+    .attr("orient", "auto")
+  .append("svg:path")
+    .attr("d", "M0,-5L10,0L0,5");
+     
+	  var link = svg.append("g")
+		  .attr("class", "links")
+		.selectAll("path")
+		.data(graph.links)
+		.enter().append("path")
+			.filter(
+				function(d) { 
+					var found = false; 
+					for (var i=0; i<uniques.length; i++) {
+						var findstr = d.source+d.target; //avoid creating the same link multiple times by creating a unique id for each direction
+						if (uniques[i] == findstr){
+							found = true; 
+						}
+					} if (found == false) {	
+						if ((+d.timestamp < +timeLimits[1]) && (+d.timestamp > +timeLimits[0])) {
+							if (category == "all") {
+								return d.locale;
+							}
+							else if (d.locale.toLowerCase() == category.toLowerCase()){uniques.push(d.source+d.target); } 
+							return d.locale.toLowerCase() == category.toLowerCase(); 
+						}
+					}
+				})
+		  .attr("stroke", function(d) {return color(d.source);})
+		  .attr("fill", "none")
+		  .attr("stroke-width", function(d) { return Math.sqrt(d.value); });
+		  //.attr("marker-end", "url(#end)");
+
+	  
+		var legend = svg.selectAll('.legend')
+		  .data(graph.nodes)
+		  .enter()
+		  .append('g')
+		  .attr('class', 'legend')
+		  .attr('transform', function(d, i) {
+			var height = legendRectSize + legendSpacing;
+			var offset =  -6 * height;
+			var horz = 2 * legendRectSize;
+			var vert = i * height - offset;
+			return 'translate(' + horz + ',' + vert + ')';
+		  });	
+  
+	  legend.append('rect')
+	  .attr('width', legendRectSize)
+	  .attr('height', legendRectSize)
+	  .style('fill', function(d) { return color(d.id); })
+	  .style('stroke', function(d) { return color(d.id); });
+  
+	  legend.append('text')
+	  .attr('x', legendRectSize + legendSpacing)
+	  .attr('y', 10 + legendRectSize - legendSpacing)
+	  .text(function(d) { return d.id; });
+  		
+  		
+  	  if (category != ''){
+		  var node = svg.append("g")
+			  .attr("class", "nodes")
+			.selectAll("circle")
+			.data(graph.nodes)
+			.enter().append("circle")
+			  .attr("r", 5)
+			  .attr("fill", function(d) { return color(d.id); })
+			  .call(d3.drag()
+				  .on("start", dragstarted)
+				  .on("drag", dragged)
+				  .on("end", dragended));
+
+		  node.append("title")
+			  .text(function(d) { return d.id; });
+	  
+		  node.append("text")
+			  .attr("dx", 12)
+			  .attr("dy", ".35em")
+			  .text(function(d) { return d.id; });
+			  
+		  simulation
+		  .nodes(graph.nodes)
+		  .on("tick", ticked);
+
+	  		simulation.force("link")
+		  .links(graph.links);
+		  
+		   simulation.alphaTarget(0.3).restart();
+		}  
+
+	  function ticked() {
+		link.attr("d", function(d) {
+		var dx = d.target.x - d.source.x,
+			dy = d.target.y - d.source.y,
+			dr = Math.sqrt(dx * dx + dy * dy);
+		return "M" + d.source.x + "," + d.source.y + "A" + dr + "," + dr + " 0 0,1 " + d.target.x + "," + d.target.y;
+		});
+		node
+			.attr("cx", function(d) { return d.x; })
+			.attr("cy", function(d) { return d.y; });
+	  }	
+	});
+}
+
+function select(c) { //ref:https://bl.ocks.org/fabiomainardi/00fd581dc5ba92d99eec
+	category = c;
+	render();        
+}
+    
+function dragstarted(d) {
+  if (!d3.event.active) simulation.alphaTarget(0.3).restart();
+  d.fx = d.x;
+  d.fy = d.y;
+}
+
+function dragged(d) {
+  d.fx = d3.event.x;
+  d.fy = d3.event.y;
+}
+
+function dragended(d) {
+  if (!d3.event.active) simulation.alphaTarget(0);
+  d.fx = null;
+  d.fy = null;
+}
+
+</script>
+
+<div class="control-group"> 
+	<button onclick="select('all')">
+        All Countries
+    </button>
+    <button onclick="select('de')">
+        Germany
+    </button>
+    <button onclick="select('en-us')">
+        United States
+    </button>
+    <button onclick="select('en-gb')">
+    	Britain
+    </button>
+    <button onclick="select('el-gr')">
+        Greece (Greek)
+    </button>
+    <button onclick="select('el')">
+        Greece (English)
+    </button>
+    <button onclick="select()">
+        Clear
+    </button>
+</div>
